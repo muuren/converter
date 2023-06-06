@@ -11,7 +11,9 @@ class AuthDao:
         self.pool = sessionmaker
 
     async def get_pwdhash_value(self, user_id: int) -> str:
-        expr = select(pwdhashes_table.c.value).where(pwdhashes_table.c.user_id == user_id)
+        expr = select(pwdhashes_table.c.value).where(
+            pwdhashes_table.c.user_id == user_id
+        )
         async with self.pool() as session:
             user_coro = await session.execute(expr)
             return user_coro.scalar()  # type: ignore

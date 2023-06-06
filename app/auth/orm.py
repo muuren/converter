@@ -18,9 +18,14 @@ pwdhashes_table = sa.Table(
     "pwdhashes",
     metadata,
     sa.Column("id", sa.Integer, primary_key=True, autoincrement=True),
-    sa.Column("user_id", sa.Integer, ForeignKey("users.id", ondelete="CASCADE"),
-              unique=True, index=True),
-    sa.Column("value", sa.String(), nullable=False)
+    sa.Column(
+        "user_id",
+        sa.Integer,
+        ForeignKey("users.id", ondelete="CASCADE"),
+        unique=True,
+        index=True,
+    ),
+    sa.Column("value", sa.String(), nullable=False),
 )
 
 
@@ -28,7 +33,5 @@ def register_mapping():
     mapper_registry = registry()
     user_mapper = mapper_registry.map_imperatively(User, users_table)
     mapper_registry.map_imperatively(
-        PWDHash,
-        pwdhashes_table,
-        properties={"users": relationship(user_mapper)}
+        PWDHash, pwdhashes_table, properties={"users": relationship(user_mapper)}
     )

@@ -22,7 +22,7 @@ async def login(
         raise HTTPException(
             status_code=401,
             detail="Invalid credentials",
-            headers={"WWW-Authenticate": "Bearer"}
+            headers={"WWW-Authenticate": "Bearer"},
         )
 
 

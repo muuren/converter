@@ -22,6 +22,7 @@ from app.auth.security import JWTToken, Argon2Auth
 
 # UNIT:
 
+
 class FakeAuthDao(AuthDao):
     def __init__(self, data: dict):
         self.db = data
@@ -78,6 +79,7 @@ def test_auth():
 
 # INTEGRATION:
 
+
 @pytest.fixture
 def mappers():
     register_mapping()
@@ -103,6 +105,7 @@ async def auth_dao():
 
 
 # E2E:
+
 
 @pytest.fixture
 def test_tables_teardown():

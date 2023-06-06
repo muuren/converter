@@ -71,9 +71,7 @@ class Argon2Auth(BaseAuth):
     @classmethod
     def verify_password(cls, plain_secret: str, hashed_value: str) -> bool:
         try:
-            return argon2.verify(
-                secret=plain_secret, hash=hashed_value
-            )
+            return argon2.verify(secret=plain_secret, hash=hashed_value)
         except ValueError:
             return False
 

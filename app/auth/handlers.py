@@ -13,10 +13,10 @@ class UserAlreadyExists(BaseException):
 
 
 async def login_handler(
-        cred: UserCredentials,
-        dao: AuthDao,
-        auth: AuthProvider,
-        token: TokenProvider,
+    cred: UserCredentials,
+    dao: AuthDao,
+    auth: AuthProvider,
+    token: TokenProvider,
 ):
     user_id = await dao.get_user_id(cred.email)
     if not user_id:
@@ -33,9 +33,9 @@ async def login_handler(
 
 
 async def sign_up_handler(
-        cred: UserCredentials,
-        dao: AuthDao,
-        auth: AuthProvider,
+    cred: UserCredentials,
+    dao: AuthDao,
+    auth: AuthProvider,
 ):
     user_id = await dao.get_user_id(cred.email)
     if user_id:

@@ -21,9 +21,7 @@ def get_token_provider() -> JWTToken:
 
 @lru_cache(maxsize=1)
 def get_dao_provider() -> AuthDao:
-    options = {
-        "server_settings": {"application_name": cfg.PostgresConfig().app_name}
-    }
+    options = {"server_settings": {"application_name": cfg.PostgresConfig().app_name}}
     engine = create_async_engine(
         cfg.PostgresConfig().url, connect_args=options, echo=False
     )
