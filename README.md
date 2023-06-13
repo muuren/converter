@@ -1,4 +1,4 @@
-# Some microservices
+# Example app
 
 Currently under development
 
