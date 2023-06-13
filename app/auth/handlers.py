@@ -1,7 +1,10 @@
+from sqlalchemy.exc import IntegrityError, DBAPIError
+
 from app.auth import models as m
 from app.auth.dao import AuthDao
 from app.auth.schema import UserCredentials
 from app.auth.security import AuthProvider, TokenProvider
+from app.utils import Retry
 
 
 class InvalidCredentials(BaseException):
@@ -12,6 +15,7 @@ class UserAlreadyExists(BaseException):
     pass
 
 
+@Retry(attempts=3, delay=1.5)
 async def login_handler(
     cred: UserCredentials,
     dao: AuthDao,
@@ -31,12 +35,15 @@ async def login_handler(
         "token_type": token.type,
     }
 
+no_retry_on_error = (DBAPIError, IntegrityError)
 
+
+@Retry(attempts=3, delay=1.5, exclude_exc=no_retry_on_error)
 async def sign_up_handler(
     cred: UserCredentials,
     dao: AuthDao,
     auth: AuthProvider,
-):
+) -> m.User:
     user_id = await dao.get_user_id(cred.email)
     if user_id:
         raise UserAlreadyExists
@@ -44,5 +51,8 @@ async def sign_up_handler(
     new_user = m.User(email=cred.email)
     password_hash = m.PWDHash(value=auth.hash_password(cred.password))
     password_hash.users = new_user  # type: ignore
-    await dao.add_one(password_hash)
-    return new_user
+    try:
+        await dao.add_one(password_hash)
+        return new_user
+    except IntegrityError:
+        raise UserAlreadyExists

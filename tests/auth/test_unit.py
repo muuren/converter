@@ -2,6 +2,7 @@ import datetime
 
 import jwt
 import pytest
+import time
 from pydantic import ValidationError
 
 from app.auth import handlers as h
@@ -16,41 +17,41 @@ def test_empty_email_credentials_raises_error():
         UserCredentials(email="", password="123456789")
 
 
-def test_jwt_token_generated(auth_tokenizer, username="user"):
-    token = auth_tokenizer.create_token({"username": username})
-    token_parts = len(str(token).split("."))
+class TestJWT:
 
-    assert token
-    assert token_parts == 3
+    def test_jwt_token_create_token(self, auth_tokenizer, username="user"):
+        token = auth_tokenizer.create_token({"username": username})
+        token_parts = len(str(token).split("."))
+        assert token
+        assert token_parts == 3
 
+    def test_jwt_token_bad_issuer_raise_error(self, auth_tokenizer, username="user"):
+        tokenizer = JWTToken(JWTConfig(issuer="fake_issuer"))
+        user_token = tokenizer.create_token({"username": username})
 
-def test_jwt_token_bad_issuer_raise_error(auth_tokenizer, username="user"):
-    tokenizer = JWTToken(JWTConfig(issuer="fake_issuer"))
-    user_token = tokenizer.create_token({"username": username})
+        with pytest.raises(jwt.InvalidIssuerError):
+            auth_tokenizer.verify_token(user_token)
 
-    with pytest.raises(jwt.InvalidIssuerError):
-        auth_tokenizer.verify_token(user_token)
+    def test_expired_jwt_token_raise_error(self, auth_tokenizer, username="user"):
+        expire = datetime.datetime.utcnow() - datetime.timedelta(minutes=5)
+        payload = {"username": username, "exp": expire}
+        expired_token = auth_tokenizer.create_token(payload)
+        with pytest.raises(jwt.ExpiredSignatureError):
+            auth_tokenizer.verify_token(expired_token)
 
-
-def test_expired_jwt_token_raise_error(auth_tokenizer, username="user"):
-    expire = datetime.datetime.utcnow() - datetime.timedelta(minutes=5)
-    payload = {"username": username, "exp": expire}
-    expired_token = auth_tokenizer.create_token(payload)
-    with pytest.raises(jwt.ExpiredSignatureError):
-        auth_tokenizer.verify_token(expired_token)
-
-
-def test_malformed_jwt_token_raise_error(auth_tokenizer):
-    token = "dlkfjal;kdfjsl;kfjdlkfjsdf"
-    with pytest.raises(jwt.DecodeError):
-        auth_tokenizer.verify_token(token)
+    def test_malformed_jwt_token_raise_error(self, auth_tokenizer):
+        token = "dlkfjal;kdfjsl;kfjdlkfjsdf"
+        with pytest.raises(jwt.DecodeError):
+            auth_tokenizer.verify_token(token)
 
 
 def test_argon_auth_return_hash(test_auth):
+    start_time = time.time()
     test_string = "some_p@ssw0rd"
     data_hash = test_auth.hash_password(test_string)
-
-    assert data_hash.startswith("$argon2id$v=19$m=65536,t=3,p=4$")
+    end_time = time.time() - start_time
+    assert end_time < 0.04
+    assert data_hash.startswith("$argon2id$v=")
 
 
 def test_argon_auth_validate_hash(test_auth):

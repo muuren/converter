@@ -2,10 +2,10 @@ import sqlalchemy as sa
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import registry, relationship
 
-from app.auth.config import PostgresConfig
+from app.auth.config import pg_config
 from app.auth.models import User, PWDHash
 
-metadata = sa.MetaData(schema=PostgresConfig().schema)
+metadata = sa.MetaData(schema=pg_config.schema)
 
 users_table = sa.Table(
     "users",

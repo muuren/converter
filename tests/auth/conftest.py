@@ -3,11 +3,10 @@ from typing import Optional
 import pytest
 import pytest_asyncio
 from fastapi.testclient import TestClient
-from sqlalchemy import TextClause, create_engine
+from sqlalchemy import create_engine, TextClause
 from sqlalchemy.ext.asyncio import (
-    async_sessionmaker,
     AsyncEngine,
-    create_async_engine,
+    create_async_engine, async_sessionmaker,
 )
 from sqlalchemy.orm import sessionmaker, clear_mappers
 
@@ -21,7 +20,6 @@ from app.auth.security import JWTToken, Argon2Auth
 
 
 # UNIT:
-
 
 class FakeAuthDao(AuthDao):
     def __init__(self, data: dict):
@@ -79,7 +77,6 @@ def test_auth():
 
 # INTEGRATION:
 
-
 @pytest.fixture
 def mappers():
     register_mapping()
@@ -98,14 +95,14 @@ async def recreate_tables(engine: AsyncEngine, schema):
 
 @pytest_asyncio.fixture
 async def auth_dao():
+    conf = PostgresConfig(schema="test")
     engine = create_async_engine(url="sqlite+aiosqlite:///")
-    await recreate_tables(engine, schema="test")
+    await recreate_tables(engine, conf.schema)
     pool = async_sessionmaker(bind=engine, expire_on_commit=False)
     yield AuthDao(pool)
 
 
 # E2E:
-
 
 @pytest.fixture
 def test_tables_teardown():

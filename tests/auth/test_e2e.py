@@ -3,8 +3,8 @@ from fastapi import status
 
 from app.auth.schema import UserCredentials
 
-sign_up_endpoint = "/api/v1/sign_up"
-login_endpoint = "/api/v1/login"
+sign_up_endpoint = "/api/sign_up"
+login_endpoint = "/api/login"
 
 new_user_form_data = UserCredentials(email="abc@mail.post", password="-123456789")
 

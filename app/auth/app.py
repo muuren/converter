@@ -3,12 +3,14 @@ from sqlalchemy.orm import clear_mappers
 
 from app.auth import dependencies as deps
 from app.auth.routes import auth_router
+from app.logger import setup_logger
+
+setup_logger(log_level=20)
 
 
 def create_app():
     fastapi_app = FastAPI(
-        title="Auth server",
-        docs_url="/",
+        title="Auth server"
     )
     fastapi_app.include_router(auth_router)
     return fastapi_app
@@ -23,5 +25,5 @@ async def startup_event():
 
 
 @app.on_event("shutdown")
-async def startup_event():
+async def shutdown_event():
     clear_mappers()

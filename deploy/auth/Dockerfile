@@ -13,6 +13,10 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /root/.cache /usr/share/doc/* && \
     useradd --r --user-group app
 
+WORKDIR converter
+
 COPY $HOME .$HOME
+COPY /app/logger.py ./app/logger.py
+COPY /app/utils.py ./app/utils.py
 
 USER app

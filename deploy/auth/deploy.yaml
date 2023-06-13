@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auth
+  labels:
+    app: auth
+
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: auth
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 3
+  template:
+    metadata:
+      labels:
+        app: auth
+    spec:
+      containers:
+      - name: auth
+        image: muuren/auth:latest
+        command: ["uvicorn"]
+        args: ["app.auth.app:app", "--host", "0.0.0.0", "--port", "8080"]
+        imagePullPolicy: Always
+        ports:
+          - containerPort: 8080
+        envFrom:
+          - configMapRef:
+              name: auth-configmap
+          - secretRef:
+              name: auth-secret
+        livenessProbe:
+          httpGet:
+            port: 8080
+            path: /docs
+          initialDelaySeconds: 15
+          periodSeconds: 15
+        resources:
+          requests:
+            memory: "100Mi"
+            cpu: "0.3"
+          limits:
+            memory: "100Mi"
+            cpu: "0.3"

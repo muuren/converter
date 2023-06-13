@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: auth-configmap
+data:
+  POSTGRES_HOST: db-postgresql.default.svc.cluster.local
+  POSTGRES_DATABASE: auth
+  POSTGRES_PORT: "5432"
+  POSTGRES_SCHEMA: app
+  POSTGRES_APP_NAME: auth
+  POSTGRES_TIMEOUT: "2"
+  JWT_ALGORITHM: HS256
+  JWT_ISSUER: AuthIdentityServer
+  JWT_EXPIRE_MIN: "60"

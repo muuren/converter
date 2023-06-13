@@ -4,7 +4,7 @@ from app.auth import dependencies as deps
 from app.auth import handlers
 from app.auth.schema import UserCredentials
 
-auth_router = APIRouter(tags=["authentication"], prefix="/api/v1")
+auth_router = APIRouter(tags=["authentication"], prefix="/api")
 
 
 @auth_router.post("/login/")
@@ -37,4 +37,6 @@ async def sign_up(
     try:
         return await handlers.sign_up_handler(form_data, dao, auth)
     except handlers.UserAlreadyExists:
-        raise HTTPException(status_code=422, detail="User already exists")
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="User already exists"
+        )

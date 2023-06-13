@@ -35,7 +35,9 @@ class JWTToken(BaseToken):
         Args:
             user_data (dict): user data to add to a payload
         """
-        expire = datetime.utcnow() + timedelta(minutes=self.config.expire_min)
+        expire = datetime.utcnow() + timedelta(
+            minutes=self.config.expire_min  # type: ignore[arg-type]
+        )
 
         payload = dict(exp=expire, iat=datetime.utcnow(), iss=self.config.issuer)
         payload.update(**user_data)
@@ -78,4 +80,4 @@ class Argon2Auth(BaseAuth):
     @classmethod
     def hash_password(cls, plain_secret: str) -> str:
         """Hash secret string with auto-generated salt."""
-        return argon2.hash(plain_secret)
+        return argon2.using(memory_cost=32768).hash(plain_secret)

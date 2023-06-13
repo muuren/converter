@@ -2,7 +2,7 @@ from functools import lru_cache
 
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
 
-import app.auth.config as cfg
+from app.auth.config import pg_config, jwt_config
 from app.auth.dao import AuthDao
 from app.auth.orm import register_mapping
 from app.auth.security import JWTToken, BaseAuth, Argon2Auth
@@ -15,15 +15,17 @@ def get_auth_provider() -> BaseAuth:
 
 @lru_cache(maxsize=1)
 def get_token_provider() -> JWTToken:
-    config = cfg.JWTConfig()
-    return JWTToken(config=config)
+    return JWTToken(config=jwt_config)
 
 
 @lru_cache(maxsize=1)
 def get_dao_provider() -> AuthDao:
-    options = {"server_settings": {"application_name": cfg.PostgresConfig().app_name}}
+    options = {
+        "timeout": pg_config.timeout,
+        "server_settings": {"application_name": pg_config.app_name},
+    }
     engine = create_async_engine(
-        cfg.PostgresConfig().url, connect_args=options, echo=False
+        pg_config.url, connect_args=options, echo=False, pool_pre_ping=True
     )
     pool = async_sessionmaker(engine, expire_on_commit=False)
     return AuthDao(pool)

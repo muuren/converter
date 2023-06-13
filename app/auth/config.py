@@ -1,16 +1,17 @@
 import os
-from typing import NamedTuple
+from typing import NamedTuple, Optional
 
 
 class PostgresConfig(NamedTuple):
-    user: str = os.getenv("POSTGRES_USERNAME", default="local_user")
-    password: str = os.getenv("POSTGRES_PASSWORD", default="localpassword")
-    host: str = os.getenv("POSTGRES_HOST", default="localhost")
-    port: str = os.getenv("POSTGRES_PORT", default="32769")
-    database: str = os.getenv("POSTGRES_DATABASE", default="localdb")
-    schema: str = os.getenv("POSTGRES_SCHEMA", default="app")
-    driver: str = os.getenv("POSTGRES_DRIVER", default="postgresql+asyncpg")
-    app_name: str = os.getenv("POSTGRES_APP_NAME", default="app")
+    user: Optional[str] = os.getenv("POSTGRES_USERNAME")
+    password: Optional[str] = os.getenv("POSTGRES_PASSWORD")
+    host: Optional[str] = os.getenv("POSTGRES_HOST")
+    port: Optional[str] = os.getenv("POSTGRES_PORT", default="32768")
+    database: Optional[str] = os.getenv("POSTGRES_DATABASE")
+    schema: Optional[str] = os.getenv("POSTGRES_SCHEMA")
+    driver: Optional[str] = "postgresql+asyncpg"
+    app_name: Optional[str] = os.getenv("POSTGRES_APP_NAME")
+    timeout: Optional[int] = int(os.getenv("POSTGRES_TIMEOUT", default=3))
 
     @property
     def url(self):
@@ -28,9 +29,13 @@ class PostgresConfig(NamedTuple):
 
 class JWTConfig(NamedTuple):
     algorithm: str = os.getenv("JWT_ALGORITHM", default="HS256")
-    key: str = os.getenv("JWT_KEY", default="development_key")
-    issuer: str = os.getenv("JWT_ISSUER", default="IdentityServer")
-    expire_min: int = int(os.getenv("JWT_EXPIRE_MIN", default=60))
+    key: Optional[str] = os.getenv("JWT_KEY")
+    issuer: Optional[str] = os.getenv("JWT_ISSUER")
+    expire_min: Optional[int] = int(os.getenv("JWT_EXPIRE_MIN", default=60))
 
     def __str__(self):
         return f"JWTConfig(algorithm={self.algorithm}, issuer={self.issuer}, expire_min={self.expire_min})"
+
+
+pg_config = PostgresConfig()
+jwt_config = JWTConfig()

@@ -19,9 +19,9 @@ class PasswordRequestForm:
     """
 
     def __init__(
-        self,
-        email: str = Form(default="name@email.com"),
-        password: str = Form(min_length=6, max_length=20),
+            self,
+            email: str = Form(default="name@email.com"),
+            password: str = Form(min_length=6, max_length=20),
     ):
         self.email = email
         self.password = SecretStr(password)

@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: auth-migration
+spec:
+  containers:
+  - name: auth-migration
+    image: muuren/migrations:latest
+    imagePullPolicy: Always
+    command: ["alembic"]
+    args: ["upgrade", "head"]
+    envFrom:
+    - configMapRef:
+        name: auth-configmap
+    - secretRef:
+        name: auth-secret
+  restartPolicy: Never
